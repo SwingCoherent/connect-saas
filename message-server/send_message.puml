@@ -1,0 +1,47 @@
+@startuml
+autonumber
+
+actor "WebUI" as client
+
+box MessageService
+participant "IMessageApplicationService" as msMessageAppService
+participant "IMessageRepository" as msMessageRepository
+participant "Message" as msMessage
+participant "IAppRepository" as msAppRepository
+participant "App" as msApp
+participant "ITemplateApplicationService" as msTemplateAppService
+
+end box
+
+box WhatsAppService #LightBlue
+
+participant "IMessageApplicationService" as wsMessageAppService
+
+end box
+
+client -> msMessageAppService : SendMessage(messageId)
+msMessageAppService -> msMessageRepository:Get(messageId)
+msMessageRepository -> msMessage:messge = new ()
+msMessageAppService -> msAppRepository:app = GetByChannel(message.Channel)
+msAppRepository -> msApp:app = new()
+
+alt TextMessage
+msMessageAppService -> msMessage:content = GenerateContent()
+msMessage -> msMessage:parameterValues = GetParameterValues()
+msMessage -> msMessage:ReplaceContentParameter(parameterValues)
+msMessageAppService <-- msMessage:content
+
+msMessageAppService -> wsMessageAppService:SendTextMessage(app.appId,whatsAppId:message.ContactAccount,content)
+
+else MediaMessage
+msMessageAppService -> wsMessageAppService:SendMediaMessage(app.appId,whatsAppId:message.ContactAccount,mediaUrl,caption)
+
+else TemplateMessage
+msMessageAppService -> msMessage:parameterValues = GetParameterValues()
+msMessageAppService -> msMessageAppService:parameterValueDtos = MapToDto(parameterValues)
+msMessageAppService -> wsMessageAppService:SendTemplateMessage(app.appId,whatsAppId:message.ContactAccount,message.templateId,parameterValueDtos)
+
+end
+
+
+@enduml

@@ -1,0 +1,41 @@
+@startuml
+hide empty member
+
+package Common{
+    enum EChannel
+    {
+        WhatsApp
+        Messager
+        SMS
+    }
+     
+    class App #yellow
+    {
+        TenantId:Guid
+        Chanel:EChannel
+        MessageAppId:Guid
+        MessageDailySendQuota:int
+        ChangeMessageDailySendQuota(messageDailySendQuota:int)
+    }
+    App -- EChannel
+    
+    class MessageDailySendQuota #yellow
+    {
+        AppId:Guid
+        Day:Date
+        TotalQuota:Number
+        RemainedQuota:Number
+        ConsumeQuota(quota:Number)
+    }
+    
+    class ConsumeMessageDailySendQuotaManager
+    {
+        ConsumeQuota(appId:Guid,day:Date,consumeQuota:Number)
+    }
+   
+    class GetMessageDailySendQuotaManager
+   {
+       GetQuota(appId:Guid,day:Date):MessageDailySendQuota
+   }
+}
+@enduml

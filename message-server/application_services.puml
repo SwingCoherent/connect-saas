@@ -1,0 +1,31 @@
+@startuml
+
+hide empty member
+
+interface IAppApplicationService
+{
+    +Register(tenantId,chanel,name)
+    +Approve(appId,namespace,businessApiUrl)
+}
+
+interface ICampaignApplicationService
+{
+    +GenerateMessage(campaignId)
+}
+
+interface IMessageApplicationService
+{
+    +SendMessage(messageId)
+}
+
+interface IMessageTemplateApplicationService
+{
+    +Create(appId,name,description,language,titleType,parameterDtos[],callToActionButtonDtos[],quickRepliesButtonDtos[])
+    +Approve(templateId)
+    +GetUsableList(appId):MessageTemplateDto[]
+    +GetParameters(templateId):MessageTemplateParameterDto[]
+}
+
+
+
+@enduml

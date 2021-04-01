@@ -1,0 +1,76 @@
+@startuml
+hide empty member
+
+package Campaign{
+    enum ECampaignStatus
+    {
+        Draft
+        Ongoing
+        Paused?
+        Completed
+    }
+    
+    enum ECampaignMessageStatus
+    {
+        WaitingSend
+        Sent
+        Delivered
+        Read
+        Click
+        Failed
+        FailedAndIgnored
+    }
+    
+    class Campaign #yellow
+    {
+        TenantName:string
+        Channel:EChannel
+        Status:ECampaignStatus
+        Steps:CampaignStep[]
+        Recipients:Recipient[]
+        Labels:CampaignLabel[]
+    }
+    Campaign -- ECampaignStatus
+    Campaign "1" o-- "1..*" CampaignStep
+    Campaign "1" o-- "1..*" Recipient
+    Campaign "1" o-- "0..*" CampaignLabel
+    
+    class CampaignStep
+    {
+        MessageTemplateId:Guid
+        Schedules:SendSchedule[]
+    }
+    CampaignStep "1" o-- "1..*" SendSchedule
+    
+    class SendSchedule
+    {
+        Time:DateTime
+        Count:int
+    }
+    
+    class CampaignLabel
+    {
+        Title:string
+    }
+    
+   class CampaignMessage #yellow
+   {
+        CampaignId:Guid
+        CampaignStepId:Guid
+        RecipientId:Guid
+        ScheduleSendTime:DateTime
+        Status:ECampaignMessageStatus
+        RetryCount:Number
+        Description
+        ExtraProperties
+   }
+   CampaignMessage -- ECampaignMessageStatus
+   
+   class Recipient
+   {
+        AccountNumber
+        ExtraProperties
+   }
+}
+
+@enduml

@@ -1,0 +1,22 @@
+@startuml
+autonumber
+
+header 申请模版
+
+actor "前端" as client
+
+box MessageService
+participant "ITemplateApplicationService" as msTemplateAppService
+
+end box
+
+box WhatsAppService #LightBlue
+
+participant "IMessageTemplate\rApplicationService" as wsTemplateAppService
+
+end box
+
+client ->msTemplateAppService : Create(channelId,)
+
+
+@enduml

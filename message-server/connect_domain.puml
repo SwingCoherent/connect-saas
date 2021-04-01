@@ -1,0 +1,16 @@
+@startuml
+hide empty member
+
+header Connect(具体的业务系统)
+
+package Campaign
+{
+    class Campaign
+    {
+        
+    }
+    
+    
+
+}
+@enduml

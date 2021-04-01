@@ -1,0 +1,37 @@
+@startuml
+autonumber
+
+actor  client
+
+box MessageService
+participant "IAppApplicationService" as ms_AppAppService
+participant "App" as ms_App
+participant "IAppRepository" as ms_AppRepository
+
+end box
+
+box WhatsAppService #LightBlue
+
+participant "IAppApplicationService" as ws_AppAppService
+participant "App" as ws_App
+participant "IAppRepository" as ws_AppRepository
+
+end box
+client -> ms_AppAppService:Register(tenantId,channel,name)
+ms_AppAppService -> ms_AppAppService:CheckChanelExists(channel)
+
+alt Channel:WhatsApp
+
+ms_AppAppService -> ws_AppAppService:messageAppId = Register(name)
+
+end
+
+ws_AppAppService -> ws_App:app = new (id,name)
+ws_AppAppService -> ws_AppRepository:Insert(app)
+ws_AppAppService --> ms_AppAppService:messageAppId
+
+ms_AppAppService -> ms_App:app = new (tenantId,channel,name,messageAppId)
+ms_AppAppService -> ms_AppRepository:Insert(app)
+
+
+@enduml

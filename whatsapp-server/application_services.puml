@@ -1,0 +1,35 @@
+@startuml
+
+hide empty member
+interface IAppApplicationService
+{
+    +Register(name)
+    +Approve(name,namespace,password,businessApiUrl)
+}
+
+interface IMessageTemplateApplicationService
+{
+    +Create(appId,name,description,language,titleType,parameterDtos[],callToActionButtonDtos[],quickRepliesButtonDtos[])
+    +Approve(templateId)
+    +GetUsableList(appId):MessageTemplateDto[]
+    +GetParameters(templateId):MessageTemplateParameterDto[]
+}
+
+interface IMessageApplicationService
+{
+    +SendTextMessage(appId,whatsAppId,content)
+    +SendMediaMessage(appId,whatsAppId,mediaUrl,caption)
+    +SendTemplateMessage(appId,whatsAppId,templateId,parameterValue[])
+    +StatusCallback(whatsAppMessageId,status)
+}
+
+interface IContactApplicationService
+{ 
+    +Valid(whatsAppIds:string[]):ContactValidResultDto[]
+}
+
+
+
+
+
+@enduml

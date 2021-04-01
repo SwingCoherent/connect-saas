@@ -1,0 +1,45 @@
+@startuml
+autonumber
+
+actor  client
+
+box MessageService
+participant "IAppApplicationService" as ms_AppAppService
+participant "IAppRepository" as ms_AppRepository
+participant "App" as ms_App
+
+end box
+
+box WhatsAppService #LightBlue
+
+participant "IAppApplicationService" as ws_AppAppService
+participant "IAppRepository" as ws_AppRepository
+participant "App" as ws_App
+participant "WhatsAppHttpClient" as ws_whatsAppClient
+end box
+client -> ms_AppAppService:Approve(appId,namespace,businessApiUrl)
+ms_AppAppService -> ms_AppRepository:app = GetById(appId)
+ms_AppRepository -> ms_App:app = new()
+ms_AppRepository --> ms_AppAppService:app
+ms_AppAppService -> ws_AppAppService:Approve(appId:app.MessageAppId,namespace,businessApiUrl)
+
+ws_AppAppService -> ws_AppRepository:app = Get(appId)
+ws_AppAppService -> ws_App:Approve(namespace,businessApiUrl)
+ws_AppAppService -> ws_AppRepository:Update(app)
+ws_AppAppService -> ws_whatsAppClient:Register(businessApiUrl)
+ws_whatsAppClient -> ws_whatsAppClient:WhatsApp3StepsVerify()
+                                       
+
+
+ws_AppAppService --> ms_AppAppService:approveResult
+
+alt approveResult = Success
+ms_AppAppService -> ms_App:ApproveSuccess()
+
+else approveResult = Fail
+ms_AppAppService -> ms_App:ApproveFail()
+end
+
+ms_AppAppService -> ms_AppRepository:Update(app)
+
+@enduml

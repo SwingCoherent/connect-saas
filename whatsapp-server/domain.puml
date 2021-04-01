@@ -1,0 +1,192 @@
+@startuml whatsapp-service-domain
+hide empty member
+
+header WhatsApp服务
+
+package App{
+
+    class App
+    {
+        Name:string
+        Namespace:string
+        BusinessApiUrl:string
+    }
+}
+
+package WhatsAppMessage
+{
+    enum EMessageStatus
+    {
+        Sent
+        Deliver
+        Read
+        Delete
+        Fail
+    }
+    
+    class TemplateMessage #yellow{
+        AppId:Guid
+        WhatsAppId:string
+        Namespace:string
+        TemplateId:Guid
+        LanguageCode:string
+        ParameterValues:MessageTemplateParameterValue[]
+        CurrentStatus:EMessageStatus
+        StatusLogs:MessageStatusLog[]
+        MessageBatchId:Guid
+        WhatsAppMessageId:string
+        IsSendSuccess:bool
+        ApiResult:string
+    }
+    TemplateMessage -- EMessageStatus
+    TemplateMessage "1" --> "*" MessageParameterValue
+    
+    class MessageParameterValue
+    {
+        MessageId:Guid
+        Type:EParameterType
+        Value:string
+        SortNumber:int
+    }
+    MessageParameterValue -- EParameterType
+   
+    class MessageStatusLog
+    {
+        MessageId:Guid
+        Status:EMessageStatus
+        LogTime
+    }
+    TemplateMessage "1" --> "*" MessageStatusLog
+    MessageStatusLog -- EMessageStatus
+    
+    class SimpleMessage #yellow
+    {
+        AppId:Guid
+        WhatsAppId:string
+        Type:SimpleMessageType
+        MediaUrl:string
+        Text:string
+        CurrentStatus:EMessageStatus
+        StatusLogs:MessageStatusLog[]
+        MessageBatchId:Guid
+        WhatsAppMessageId:string
+    }
+    SimpleMessage -- EMessageStatus
+    SimpleMessage "1" -- "*" MessageStatusLog
+    SimpleMessage -- SimpleMessageType
+    
+    enum SimpleMessageType
+    {
+        Text
+        Image
+        Document
+        Video
+        Audio
+        Sticker
+    }
+    
+    class MessageBatch #yellow
+    {
+        SourceId:Guid
+        SourceItemId:Guid
+        TotalCount:int
+        ReceiveCount:int
+        CompleteCount:int
+    }
+}
+
+package WhatsAppTemplate
+{
+    class Template
+    {
+        AppId:Guid
+        Title:string
+        Name:string
+        Enabled:bool
+        Contents:MessageTemplateContent[]
+        Parameters:MessageTemplateParameter[]
+        CallToActionButtons:CallToActionButton[]
+        QuickRepliesButtons:QuickRepliesButton[]
+    }
+    
+    class TemplateContent
+    {
+        TemplateId:Guid
+        Language:ELanguage
+        Content:string
+    }
+    Template "1" -- "1..*" TemplateContent
+    
+    enum ELanguage
+    {
+        English
+        Chinese
+        Indonesian
+    }
+    TemplateContent -- ELanguage
+   
+    
+    class CallToActionButton
+    {
+        TemplateId:Guid
+        Type:ECallToActionButtonType
+        Text:string
+        Content:string
+    }
+    Template "1" -- "0..2" CallToActionButton
+    
+    enum ECallToActionButtonType
+    {
+        CallPhoneNumber
+        VisitWebsite
+    }
+    CallToActionButton -- ECallToActionButtonType
+    
+   abstract class QuickReplyButton
+    {
+        TemplateId:Guid
+        Text:string
+        {abstract} Excute()
+    }
+    Template "1" -- "0..3" QuickReplyButton
+    
+    class AgentMessageQuickReplyButton
+    {
+        Excute()
+    }
+    AgentMessageQuickReplyButton --|> QuickReplyButton
+        
+    class TemplateParameter
+    {
+        TemplateId:Guid
+        Name:string
+        SortNumber:int
+        Type:EParameterType
+        DataType:EParameterDataType
+    }
+    Template "1" -- "0..*" TemplateParameter
+    TemplateParameter -- EParameterDataType
+    TemplateParameter -- EParameterType
+    
+    enum EParameterDataType
+    {
+        Text
+        Currency
+        DateTime
+        Image
+        Document
+        Video
+    }
+    
+    enum EParameterType
+    {
+        Header
+        Body
+        Footer
+    }
+}
+
+
+
+@enduml
+

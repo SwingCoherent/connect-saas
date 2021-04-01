@@ -1,0 +1,44 @@
+@startuml
+autonumber
+
+actor  client
+
+box MessageService
+
+participant "ICampaignApplicationService" as msCampaignAppService
+participant "Campaign" as msCampaign
+participant "CsvData" as msCsvData
+participant "IMessageApplicationService" as msMessageAppService
+participant "ITemplateApplicationService" as msTemplateAppService
+participant "MessageTemplate" as msMessageTemplate
+participant "Message" as msMessage
+participant "MessageParameterValue" as msMessageParameterValue
+
+end box
+
+client -> msCampaignAppService : GenerateMessage(campaignId)
+msCampaignAppService -> msCampaign:GenerateMessage():Message[]
+
+activate msCampaign
+msCampaign -> msCampaign:GetDatas():CsvData[]
+msCampaign -> msCampaign:GetItems()
+msCampaign -> msTemplateAppService:GetTemplateFromId(templateId):MessageTemplate
+msCampaign -> msMessageTemplate:GetParameters():TemplateParameter[]
+
+loop csvDatas
+    loop items
+        msCampaign -> msMessage : new Message(campaignId,campaignItemId,messageTemplateId)
+        loop templateParameters
+            msCampaign -> msCsvData : value = GetFieldValue(parameterName)
+            msCampaign -> msMessageParameterValue:new MessageParameterValue(messageId,messageTemplateParameterId,value)
+            msCampaign -> msMessage:AddParameterValue(parameterValue)
+        end
+    end
+end
+
+msCampaignAppService <-- msCampaign:Message[]
+
+
+
+
+@enduml

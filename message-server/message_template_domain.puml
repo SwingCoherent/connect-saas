@@ -1,0 +1,123 @@
+@startuml
+hide empty member
+
+header Message service
+
+package MessageTemplate
+{
+    enum ETriggerType
+    {
+        Schedule
+        ApiCall
+    }
+
+    enum EParameterValueSourceType
+    {
+        DataSource
+        Variable
+        ?System?
+    }
+    
+    enum ELanguage
+    {
+        English
+        Chinese
+        ...
+    }
+    
+    enum EMessageTemplateType
+    {
+        Simple
+        Template
+    }
+    
+    enum EMessageTemplateDataType
+    {
+        Text
+        Currency
+        DateTime
+        Image
+        Document
+        Video
+    }
+    
+    class MessageTemplateSeries #yellow
+    {
+        Title:string
+        Description:string
+    }
+    
+    class MessageTemplate #yellow
+    {
+        TenantId:string
+        MessageTemplateSeriesId:Guid
+        Name:string
+        Channel:EChannel
+        CategoryId:Guid
+        Type:EMessageTemplateType
+        TriggerType:ETriggerType
+        TargetMessageTemplateId:Guid
+        Header:MessageTemplateHeader
+        Bodys:MessageTemplateBody[]
+        BodyParameters:MessageTemplateBodyParameter[,]
+        Footer:MessageTemplateFooter
+    }
+  
+    MessageTemplate -- EMessageTemplateType
+    MessageTemplate -- ETriggerType
+    MessageTemplate "1" o-- "0..1" MessageTemplateHeader
+    MessageTemplate "1" o-- "0..1" MessageTemplateFooter
+    MessageTemplate "1" o-- "1..3" MessageTemplateBody
+    MessageTemplate "1" o-- "0..*" MessageTemplateBodyParameter
+    
+    class MessageTemplateHeader
+    {
+        MessageTemplateId:Guid
+        DataType:EMessageTemplateDataType
+        Content:string
+    }
+    MessageTemplateHeader -- EMessageTemplateDataType
+    
+    class MessageTemplateBody
+    {
+        MessageTemplateId:Guid
+        Language:ELanguage
+        Content
+    }
+    MessageTemplateBody -- ELanguage
+    
+    class MessageTemplateFooter
+    {
+        MessageTemplateId:Guid
+        DataType:EMessageTemplateDataType
+        Content:string
+    }
+    MessageTemplateFooter -- EMessageTemplateDataType
+    
+    class MessageTemplateCategory
+    {
+        Name:string
+    }
+    
+    class MessageTemplateBodyParameter
+    {
+        MessageTemplateId:Guid
+        Name:string
+        ValueSourceType:EParameterValueSourceType
+        DefaultValue:string
+        Value:string
+        IsRequired:bool
+        DataType:EMessageTemplateDataType
+        SortNumber:Number
+    }
+    MessageTemplateBodyParameter -- EParameterValueSourceType
+    MessageTemplateBodyParameter -- EMessageTemplateDataType
+    
+    class SystemParameter? #gray
+    {
+        Name:string
+        Value:string
+        Enabled:bool
+    }
+}
+@enduml
